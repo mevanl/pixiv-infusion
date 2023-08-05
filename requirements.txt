@@ -1,3 +1,4 @@
 requests
 pixivpy3
 customtkinter
+Pillow
