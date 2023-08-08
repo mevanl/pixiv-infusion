@@ -1,11 +1,21 @@
+from threading import Thread
 import customtkinter as ctk
 from PIL import Image
 
 
 class MenuBar(ctk.CTkFrame):
-    def __init__(self, master: ctk.CTk, **kwargs):
+    def __init__(self, master: ctk.CTk, start_x: float, end_x: float, **kwargs):
         super().__init__(master=master, **kwargs)
         self.master = master
+
+        # Menu Attributes
+        self.start_position: float = start_x
+        self.end_position: float = end_x
+        self.width = abs(start_x - end_x) - 0.03
+
+        # Menu animation
+        self.current_position = self.start_position
+        self.on_screen = False
 
         self.settings_button = ctk.CTkButton(self,
                                              text='Settings',
@@ -13,6 +23,34 @@ class MenuBar(ctk.CTkFrame):
                                              font=('Segoe UI Semibold', 35),
                                              fg_color='#0096fa',
                                              corner_radius=5)
+
+        self.place(relx=self.start_position, rely=0.06, relwidth=self.width, relheight=0.4)
+        self.settings_button.pack()
+
+    def menu_animation(self):
+        if self.on_screen:
+            self.animation_backward()
+        else:
+            self.animation_forward()
+
+    def animation_forward(self):
+        if self.current_position < self.end_position:
+            self.current_position += 0.008
+            self.place(relx=self.current_position, rely=0.06, relwidth=self.width, relheight=0.4)
+            self.after(1, self.animation_forward())
+        else:
+            self.on_screen = True
+
+    def animation_backward(self):
+        if self.current_position > self.start_position:
+            self.current_position -= 0.008
+            self.place(relx=self.current_position, rely=0.06, relwidth=self.width, relheight=0.4)
+            self.after(1, self.animation_backward())
+        else:
+            self.on_screen = False
+
+    def start_menu_animation(self):
+        Thread(target=self.menu_animation(), daemon=True).start()
 
 
 class SideFrame(ctk.CTkFrame):
@@ -24,26 +62,16 @@ class SideFrame(ctk.CTkFrame):
         self.label = ctk.CTkLabel(self, text='Pixiv Infusion', text_color='#FAFAFA', font=('Segoe UI Semibold', 20))
         self.label.place(anchor='center', relx=0.5, rely=0.5)
 
-        self.menu_bar = MenuBar(master, fg_color='#0096fa', corner_radius=0)
+        self.menu_bar = MenuBar(master, start_x=-0.3, end_x=0.004, fg_color='#0096fa', corner_radius=20)
 
         self.show_sidebar = ctk.CTkButton(self,
                                           text='',
-                                          command=self.toggle_sidebar,
+                                          command=self.menu_bar.start_menu_animation,
                                           image=image,
                                           fg_color='#0096fa',
                                           corner_radius=5)
         self.show_sidebar.place(anchor='center', relx=0.078, rely=0.52, relwidth=0.04, relheight=0.8)
 
-    def toggle_sidebar(self):
-        if self.side_shown:
-            self.menu_bar.settings_button.place_forget()
-            self.menu_bar.place_forget()
-            self.side_shown = False
-        else:
-            self.menu_bar.place(anchor='center', relx=0.0, rely=0.6, relwidth=0.4, relheight=1.1)
-            self.menu_bar.settings_button.place(anchor='center', relx=0.74, rely=0.23)
-            self.side_shown = True
-        return
 
 class Infusion:
     def __init__(self, master: ctk.CTk, image_list: list):
