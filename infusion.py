@@ -17,6 +17,13 @@ class MenuBar(ctk.CTkFrame):
         self.current_position = self.start_position
         self.on_screen = False
 
+        self.home_button = ctk.CTkButton(self,
+                                         text='Home',
+                                         text_color='#FAFAFA',
+                                         font=('Segoe UI Semibold', 35),
+                                         fg_color='#0096fa',
+                                         corner_radius=5)
+
         self.settings_button = ctk.CTkButton(self,
                                              text='Settings',
                                              text_color='#FAFAFA',
@@ -24,7 +31,9 @@ class MenuBar(ctk.CTkFrame):
                                              fg_color='#0096fa',
                                              corner_radius=5)
 
-        self.place(relx=self.start_position, rely=0.06, relwidth=self.width, relheight=0.4)
+        self.place(relx=self.start_position, rely=0.6, relwidth=self.width, relheight=0.4)
+        self.place(relx=self.start_position, rely=0.12, relwidth=self.width, relheight=0.4)
+        self.home_button.pack()
         self.settings_button.pack()
 
     def menu_animation(self):
@@ -53,7 +62,7 @@ class MenuBar(ctk.CTkFrame):
         Thread(target=self.menu_animation(), daemon=True).start()
 
 
-class SideFrame(ctk.CTkFrame):
+class TopFrame(ctk.CTkFrame):
     def __init__(self, master: ctk.CTk, image: ctk.CTkImage, **kwargs):
         super().__init__(master=master, **kwargs)
         self.master = master
@@ -91,8 +100,8 @@ class Infusion:
         self.sidebar_shown = False
 
         # Side Frame
-        self.side_frame = SideFrame(self.master, self.image_list[0], fg_color='#0096fa')
-        self.side_frame.place(relx=0.5, rely=0.026, relwidth=1.1, relheight=0.06, anchor='center')
+        self.Top_frame = TopFrame(self.master, self.image_list[0], fg_color='#0096fa')
+        self.Top_frame.place(relx=0.5, rely=0.026, relwidth=1.1, relheight=0.06, anchor='center')
 
 
 def get_images() -> list:
